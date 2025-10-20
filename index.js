@@ -28,8 +28,8 @@ db.connect((err)=>{
 
 })
 
-app.get("api/users",(req,res)=>{
-    db.query('SELECT * from users',(err,results)=>{
+app.get("/api/users",(req,res)=>{
+    db.query('SELECT * from mahasiswa',(err,results)=>{
         if (err){
             console.error('error'+ err.stack);
             res.status(500).send("error fetching users");
@@ -39,28 +39,27 @@ app.get("api/users",(req,res)=>{
         res.json(results);
     })
 })
-app.post("api/users", (req,res)=>{
-    const {nama,nim,kelas}= req.body;
+app.post("/api/users", (req, res) => {
+  const { nama, nim, kelas } = req.body;
 
-    if(!nama ||!nim||!kelas){
-        return res.status(400).json({message:"wajib diisi"});
+  if (!nama || !nim || !kelas) {
+    return res.status(400).json({ message: "Semua field wajib diisi" });
+  }
+
+  db.query(
+    "INSERT INTO mahasiswa (nama, nim, kelas) VALUES (?, ?, ?)",
+    [nama, nim, kelas],
+    (err, results) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Database error" });
+      }
+      res.status(201).json({ message: "User created successfully" });
     }
-    db.query
-    {
-        "INSERT INTO users (nama, nim, kelas) VALUES (?,?,?)",
-        [nama,nim,kelas],
-        (err, results)=>{
-            if(err){
-                console.error(err);
-                return res.status.json({message:"Database error"});
-
-            }
-            res.status(201).json({message:"User created successfully"})
-        }
-    };
+  );
 });
  
-app.put("api/users/id",(req,res)=>
+app.put("/api/users/:id",(req,res)=>
 {
     const userId=req.params.id;
     const{nama,nim,kelas}= req.body;
@@ -81,7 +80,7 @@ app.put("api/users/id",(req,res)=>
 app.delete("/api/users/:id", (req, res) => {
   const userId = req.params.id;
 
-  db.query("DELETE FROM users WHERE id=?", [userId], (err, results) => {
+  db.query("DELETE FROM mahasiswa WHERE id=?", [userId], (err, results) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ message: "Database error" });
